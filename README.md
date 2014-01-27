@@ -1,5 +1,3 @@
-== README
-
 Bem, vamos lá.
 
 Atualmente, este repositório está com a configuração básica para uma VM com projeto Rails v4.0.2, Ruby 2.1.0 e MySQL.
@@ -8,10 +6,10 @@ Vamos começar configurando o Vagrantfile:
 
 Instale primeiramente os plugins do omnibus e aws
 
-#### vagrant plugin install vagrant-aws
-#### vagrant plugin install vagrant-omnibus
+### vagrant plugin install vagrant-aws
+### vagrant plugin install vagrant-omnibus
 
-### Desenvolvimento
+#### Desenvolvimento
 
 Coloque o nome do host e IP da VM.
   dev.vm.hostname = ''
@@ -22,19 +20,19 @@ Sinta-se à vontade para alterar (Host que o nginx vai servir e o nome do arquiv
   nginx_host: 'dev.nome_do_projeto.com.br' # Pode ser o endereço IP
   nginx_conf_name: 'conf_default'
 
-### Importante
+#### Importante
 Gere uma chave ssh com o comando ssh-keygen e coloque na pasta /chef/cookbooks/default/files/default 
 Os arquivos devem chamar id_rsa e id_rsa.pub
 Essas chaves serão importantes para quando formos configurar o deploy.
 
 Após isso, vamos configurar o Chef.
 
-### Chef
+#### Chef
 Por enquanto, não precisa fazer nada :)
 
 No root do projeto, dê um vagrant up e aguarde.
 
-### Homologação
+#### Homologação
 Informe os dados para permitir ao plugin acessar a API da Amazon e subir as instâncias:
 
 ## aws.access_key_id = ""
