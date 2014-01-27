@@ -8,8 +8,8 @@ Vamos começar configurando o Vagrantfile:
 
 Instale primeiramente os plugins do omnibus e aws
 
-vagrant plugin install vagrant-aws
-vagrant plugin install vagrant-omnibus
+## vagrant plugin install vagrant-aws
+## vagrant plugin install vagrant-omnibus
 
 ### Desenvolvimento
 
