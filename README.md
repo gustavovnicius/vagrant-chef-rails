@@ -11,27 +11,27 @@ Instale primeiramente os plugins do omnibus e aws
 
 #### Desenvolvimento
 
-## dev.vm.hostname = ''
-## dev.vm.network :private_network, ip: ''
+### dev.vm.hostname = ''
+### dev.vm.network :private_network, ip: ''
 Coloque o nome do host e IP da VM.
 
 ## chef.json
 Sinta-se à vontade para alterar (Host que o nginx vai servir e o nome do arquivo de configuração):
-## nginx_host: 'dev.nome_do_projeto.com.br' 
-# Pode ser o endereço IP
-## nginx_conf_name: 'conf_default'
+### nginx_host: 'dev.nome_do_projeto.com.br' 
+Pode ser o endereço IP
+### nginx_conf_name: 'conf_default'
 
-# Não esqueça de colocar no /etc/hosts!!
+Não esqueça de colocar no /etc/hosts!!
 
 #### Importante
 Gere uma chave ssh com o comando 
-## ssh-keygen 
+### ssh-keygen 
 e coloque na pasta
-## /chef/cookbooks/default/files/default 
+### /chef/cookbooks/default/files/default 
 Os arquivos devem chamar 
-## id_rsa 
+### id_rsa 
 e 
-## id_rsa.pub
+### id_rsa.pub
 Essas chaves serão importantes para quando formos configurar o deploy.
 
 Após isso, vamos configurar o Chef.
@@ -44,20 +44,20 @@ No root do projeto, dê um vagrant up e aguarde.
 #### Homologação
 Informe os dados para permitir ao plugin acessar a API da Amazon e subir as instâncias:
 
-## aws.access_key_id = ""
-## aws.secret_access_key = ""
-## aws.keypair_name = ""
+### aws.access_key_id = ""
+### aws.secret_access_key = ""
+### aws.keypair_name = ""
 
-## aws.region
+### aws.region
 Informe a região
 
-## aws.ami
+### aws.ami
 Retire o comentário da ami correspondente à região que irá usar 
 
-## aws.keypair_name
+### aws.keypair_name
 Selecione o keypair que a instância irá utilizar (ele deve ser criado na região selecionada)
 
-## override.ssh.private_key_path
+### override.ssh.private_key_path
 Coloque o caminho onde está o .pem para a instância. Normalmente colocamos em uma pasta chamada aws_keys, no projeto. Se for o caso, basta substituir as aspas em branco pelo nome do arquivo
 
 ## chef.json
