@@ -11,18 +11,27 @@ Instale primeiramente os plugins do omnibus e aws
 
 #### Desenvolvimento
 
+## dev.vm.hostname = ''
+## dev.vm.network :private_network, ip: ''
 Coloque o nome do host e IP da VM.
-  dev.vm.hostname = ''
-  dev.vm.network :private_network, ip: ''
 
 ## chef.json
 Sinta-se à vontade para alterar (Host que o nginx vai servir e o nome do arquivo de configuração):
-  nginx_host: 'dev.nome_do_projeto.com.br' # Pode ser o endereço IP
-  nginx_conf_name: 'conf_default'
+## nginx_host: 'dev.nome_do_projeto.com.br' 
+# Pode ser o endereço IP
+## nginx_conf_name: 'conf_default'
+
+# Não esqueça de colocar no /etc/hosts!!
 
 #### Importante
-Gere uma chave ssh com o comando ssh-keygen e coloque na pasta /chef/cookbooks/default/files/default 
-Os arquivos devem chamar id_rsa e id_rsa.pub
+Gere uma chave ssh com o comando 
+## ssh-keygen 
+e coloque na pasta
+## /chef/cookbooks/default/files/default 
+Os arquivos devem chamar 
+## id_rsa 
+e 
+## id_rsa.pub
 Essas chaves serão importantes para quando formos configurar o deploy.
 
 Após isso, vamos configurar o Chef.
