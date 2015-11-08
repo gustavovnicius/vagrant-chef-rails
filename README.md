@@ -1,3 +1,6 @@
+# vagrant-chef-rails
+Skeleton bundle to setup a VM with Vagrant + Chef to develop a Rails App
+
 Bem, vamos lá.
 
 Atualmente, este repositório está com a configuração básica para uma VM com projeto Rails v4.0.2, Ruby 2.1.0 e MySQL.
@@ -17,20 +20,20 @@ Coloque o nome do host e IP da VM.
 
 ## chef.json
 Sinta-se à vontade para alterar (Host que o nginx vai servir e o nome do arquivo de configuração):
-### nginx_host: 'dev.nome_do_projeto.com.br' 
+### nginx_host: 'dev.nome_do_projeto.com.br'
 Pode ser o endereço IP
 ### nginx_conf_name: 'conf_default'
 
 Não esqueça de colocar no /etc/hosts!!
 
 #### Importante
-Gere uma chave ssh com o comando 
-### ssh-keygen 
+Gere uma chave ssh com o comando
+### ssh-keygen
 e coloque na pasta
-### /chef/cookbooks/default/files/default 
-Os arquivos devem chamar 
-### id_rsa 
-e 
+### /chef/cookbooks/default/files/default
+Os arquivos devem chamar
+### id_rsa
+e
 ### id_rsa.pub
 Essas chaves serão importantes para quando formos configurar o deploy.
 
@@ -52,7 +55,7 @@ Informe os dados para permitir ao plugin acessar a API da Amazon e subir as inst
 Informe a região
 
 ### aws.ami
-Retire o comentário da ami correspondente à região que irá usar 
+Retire o comentário da ami correspondente à região que irá usar
 
 ### aws.keypair_name
 Selecione o keypair que a instância irá utilizar (ele deve ser criado na região selecionada)

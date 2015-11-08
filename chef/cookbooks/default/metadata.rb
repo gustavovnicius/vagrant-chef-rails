@@ -1,3 +1,5 @@
+name 'default'
+
 depends 'build-essential'
 depends 'ohai'
 depends 'ruby_build'

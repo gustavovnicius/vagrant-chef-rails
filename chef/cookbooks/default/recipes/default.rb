@@ -10,20 +10,18 @@ include_recipe 'git'
 include_recipe 'ruby_build'
 include_recipe 'rbenv'
 
-rbenv_ruby "2.1.0" do
-  ruby_version "2.1.0"
+rbenv_ruby '2.2.3' do
+  ruby_version '2.2.3'
   global true
 end
 
-rbenv_gem "bundler"
+rbenv_gem 'bundler'
 
-#Configure Unicorn
-package 'libpq-dev'
-
-template "/etc/init.d/unicorn" do
-  source "unicorn.init.erb"
-  owner "root"
-  group "root"
+# Unicorn
+template '/etc/init.d/unicorn' do
+  source 'unicorn.init.erb'
+  owner 'root'
+  group 'root'
   mode 00755
   variables({
     rails_path: node[:unicorn][:rails_path],
@@ -32,57 +30,57 @@ template "/etc/init.d/unicorn" do
   })
 end
 
+service 'unicorn' do
+  supports :restart => true, :start => true, :stop => true, :reload => true
+  action :enable
+end
+
+service 'unicorn' do
+  action :start
+end
+
+# Acesso ao repositório via chave ssh + ssh-forwarding
 unless(['staging', 'production'].include?(node[:environment]))
-  cookbook_file "id_rsa" do
-    path "/home/vagrant/.ssh/id_rsa"
-    owner "vagrant"
-    group "vagrant"
+  cookbook_file 'id_rsa' do
+    path '/home/vagrant/.ssh/id_rsa'
+    owner 'vagrant'
+    group 'vagrant'
     mode 00400
   end
-  
-  cookbook_file "id_rsa.pub" do
-    path "/home/vagrant/.ssh/id_rsa.pub"
-    owner "vagrant"
-    group "vagrant"
+
+  cookbook_file 'id_rsa.pub' do
+    path '/home/vagrant/.ssh/id_rsa.pub'
+    owner 'vagrant'
+    group 'vagrant'
     mode 00644
   end
-  
+
   package 'keychain'
 
-  ruby_block "insert_line" do
+  ruby_block 'insert_line' do
     block do
-      file = Chef::Util::FileEdit.new("/home/vagrant/.bashrc")
-      file.insert_line_if_no_match("eval \`ssh-agent\`; ssh-add;", "eval \`ssh-agent\`; ssh-add;")
+      file = Chef::Util::FileEdit.new('/home/vagrant/.bashrc')
+      file.insert_line_if_no_match('eval \`ssh-agent\`; ssh-add;', 'eval \`ssh-agent\`; ssh-add;')
       file.write_file
     end
   end
 end
 
-service "unicorn" do
-  supports :restart => true, :start => true, :stop => true, :reload => true
-  action :enable
-end
-
-service "unicorn" do
-  action :start
-end
-
-#Configure Nginx
+# Configure Nginx
 node.set['nginx']['default_site_enabled'] = false
-node.set['nginx']['source']['modules'] = ["http_gzip_static_module", "http_ssl_module"]
+node.set['nginx']['source']['modules'] = ['http_gzip_static_module', 'http_ssl_module']
 include_recipe 'nginx'
 
 node.set['nginx_conf']['confs'] = [
   node[:nginx_host] => {
     'action' => :create,
     'conf_name' => node[:nginx_conf_name],
-    'upstream' => {rails: ["server unix:/tmp/unicorn.sock"]},
+    'upstream' => {rails: ['server unix:/tmp/unicorn.sock']},
     'root' => "#{node['unicorn']['rails_path']}/public",
     'locations' => {
       '/' => {
         'autoindex' => 'on',
-        'proxy_set_header' => 'X-Forwarded-For $proxy_add_x_forwarded_for',
-        'proxy_set_header' => 'Host $http_host',
+        'proxy_set_header' => [ 'X-Forwarded-For $proxy_add_x_forwarded_for', 'Host $http_host', 'CLIENT_IP $remote_addr' ],
         'proxy_redirect' => 'off',
 
         'proxy_pass' => 'http://rails'
@@ -92,6 +90,7 @@ node.set['nginx_conf']['confs'] = [
 ]
 include_recipe 'nginx_conf'
 
+# MySQL
 if(node[:install_mysql])
   include_recipe 'mysql::server'
 end
@@ -106,12 +105,12 @@ mysql_connection_info = {
   :password => node[:mysql][:server_root_password]
 }
 
-mysql_database 'campaign_dev' do 
+mysql_database 'campaign_dev' do
   connection mysql_connection_info
   action :create
 end
 
-mysql_database 'campaign_test' do 
+mysql_database 'campaign_test' do
   connection mysql_connection_info
   action :create
 end
