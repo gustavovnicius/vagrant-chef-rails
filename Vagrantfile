@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     dev.vm.provision :chef_solo do |chef|
       chef.json = {
         mysql: { server_root_password: '', server_repl_password: '', server_debian_password: '', host: 'localhost' },
-        install_mysql: true,
+        install_mysql: false,
         environment: 'development',
         unicorn: { rails_path: '/vagrant' },
         nginx_host: 'dev.nome_do_projeto.com.br',

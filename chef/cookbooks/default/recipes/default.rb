@@ -95,22 +95,4 @@ if(node[:install_mysql])
   include_recipe 'mysql::server'
 end
 
-include_recipe 'mysql::client'
-
-include_recipe 'database::mysql'
-
-mysql_connection_info = {
-  :host => node[:mysql][:host],
-  :username => 'root',
-  :password => node[:mysql][:server_root_password]
-}
-
-mysql_database 'app_dev' do
-  connection mysql_connection_info
-  action :create
-end
-
-mysql_database 'app_test' do
-  connection mysql_connection_info
-  action :create
-end
+package 'libsqlite3-dev'
