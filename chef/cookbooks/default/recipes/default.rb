@@ -60,7 +60,7 @@ unless(['staging', 'production'].include?(node[:environment]))
   ruby_block 'insert_line' do
     block do
       file = Chef::Util::FileEdit.new('/home/vagrant/.bashrc')
-      file.insert_line_if_no_match('eval \`ssh-agent\`; ssh-add;', 'eval \`ssh-agent\`; ssh-add;')
+      file.insert_line_if_no_match('eval `ssh-agent`; ssh-add;', 'eval `ssh-agent`; ssh-add;')
       file.write_file
     end
   end
