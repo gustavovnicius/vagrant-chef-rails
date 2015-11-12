@@ -105,12 +105,12 @@ mysql_connection_info = {
   :password => node[:mysql][:server_root_password]
 }
 
-mysql_database 'campaign_dev' do
+mysql_database 'app_dev' do
   connection mysql_connection_info
   action :create
 end
 
-mysql_database 'campaign_test' do
+mysql_database 'app_test' do
   connection mysql_connection_info
   action :create
 end
