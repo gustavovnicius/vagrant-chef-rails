@@ -16,6 +16,7 @@ gem 'unicorn'
 gem 'unicorn-rails'
 
 group :development do
+  gem 'capistrano'
   gem 'better_errors'
   gem 'binding_of_caller', :platforms=>[:mri_20]
   gem 'html2haml'
