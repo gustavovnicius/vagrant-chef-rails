@@ -7,6 +7,7 @@ action :create do
   conf_name = new_resource.conf_name || new_resource.name
   site_type = new_resource.site_type
   socket = new_resource.socket
+  nginx_group = (node[:nginx][:group] == node[:nginx][:user]) ? 'root' : node[:nginx][:group]
   ssl = false
 
   if site_type == :dynamic
@@ -22,15 +23,21 @@ action :create do
   end
 
   if new_resource.ssl
+    ssl_name = if new_resource.ssl['name']
+      new_resource.ssl['name']
+    else
+      conf_name
+    end
+
     directory "#{node[:nginx][:dir]}/ssl" do
       owner node[:nginx][:user] 
-      group node[:nginx][:group]
+      group nginx_group
       mode '0755'
     end
 
-    file "#{node[:nginx][:dir]}/ssl/#{conf_name}.public.crt" do
+    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt" do
       owner node[:nginx][:user] 
-      group node[:nginx][:group]
+      group nginx_group
       mode '0640'
       content  <<-EOH
 # Managed by Chef.  Local changes will be overwritten.
@@ -38,9 +45,9 @@ action :create do
 EOH
     end
 
-    file "#{node[:nginx][:dir]}/ssl/#{conf_name}.private.key" do
+    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key" do
       owner node[:nginx][:user] 
-      group node[:nginx][:group]
+      group nginx_group
       mode '0640'
       content <<-EOH
 # Maintained by Chef.  Local changes will be overwritten.
@@ -49,12 +56,12 @@ EOH
     end
 
     ssl = {
-      :certificate => "#{node[:nginx][:dir]}/ssl/#{conf_name}.public.crt",
-      :certificate_key => "#{node[:nginx][:dir]}/ssl/#{conf_name}.private.key"
+      :certificate => "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt",
+      :certificate_key => "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key"
     }
   end
 
-  execute "test-nginx-conf-#{conf_name}-#{new_resource.action}" do
+  test_nginx = execute "test-nginx-conf-#{conf_name}-create" do
     action :nothing
     command "#{node[:nginx][:binary]} -t"
     only_if { new_resource.auto_enable_site }
@@ -63,10 +70,10 @@ EOH
 
   template "#{node[:nginx][:dir]}/sites-available/#{conf_name}" do
     owner node[:nginx][:user] 
-    group node[:nginx][:group]
+    group nginx_group
     mode '755'
     source(new_resource.template || 'conf.erb')
-    cookbook new_resource.template ? new_resource.cookbook_name.to_s : 'nginx_conf'
+    cookbook new_resource.template ? new_resource.cookbook.to_s : 'nginx_conf'
     variables(
       :block =>  new_resource.block,
       :options =>  options,
@@ -78,13 +85,13 @@ EOH
       :type =>  site_type,
       :ssl => ssl
     )
-    #notifies :run, 'execute[test-nginx-conf]', new_resource.reload
+    notifies :run, test_nginx, new_resource.reload
   end
 
   link "#{node[:nginx][:dir]}/sites-enabled/#{conf_name}" do
     to "#{node[:nginx][:dir]}/sites-available/#{conf_name}"
     only_if { new_resource.auto_enable_site }
-    #notifies :run, 'execute[test-nginx-conf]', new_resource.reload
+    notifies :run, test_nginx, new_resource.reload
   end
 
   new_resource.updated_by_last_action(true)
@@ -103,13 +110,31 @@ action :delete do
     notifies :restart, 'service[nginx]', new_resource.reload
   end
 
+  if node[:nginx_conf][:delete][:ssl]
+    unless new_resource.ssl && !new_resource.ssl['delete']
+      ssl_name = if new_resource.ssl && new_resource.ssl['name']
+        new_resource.ssl['name']
+      else
+        conf_name
+      end
+
+      file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt" do
+        action :delete
+      end
+
+      file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key" do
+        action :delete
+      end
+    end
+  end
+
   new_resource.updated_by_last_action(true)
 end
 
 action :enable do
   conf_name = new_resource.conf_name || new_resource.name
 
-  execute "test-nginx-conf-#{conf_name}-#{new_resource.action}" do
+  test_nginx = execute "test-nginx-conf-#{conf_name}-enable" do
     action :nothing
     command "#{node[:nginx][:binary]} -t"
     notifies :restart, 'service[nginx]', new_resource.reload
@@ -117,7 +142,7 @@ action :enable do
 
   link "#{node[:nginx][:dir]}/sites-enabled/#{conf_name}" do
     to "#{node[:nginx][:dir]}/sites-available/#{conf_name}"
-    notifies :run, 'execute[test-nginx-conf]', new_resource.reload
+    notifies :run, test_nginx, new_resource.reload
   end
 
   new_resource.updated_by_last_action(true)
